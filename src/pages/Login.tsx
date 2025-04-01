@@ -7,10 +7,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { adminLogin, consumerLogin } from "@/services/api";
 
 const Login = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState({
+    admin: false,
+    consumer: false
+  });
   
   // Admin login state
   const [adminId, setAdminId] = useState("");
@@ -22,43 +27,69 @@ const Login = () => {
   const [consumerFirstName, setConsumerFirstName] = useState("");
   const [consumerLastName, setConsumerLastName] = useState("");
   
-  const handleAdminLogin = (e: React.FormEvent) => {
+  const handleAdminLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // In a real app, this would validate against the database
-    // For now, we'll simulate successful login with mock data
-    if (adminId && adminFirstName && adminLastName) {
+    if (!adminId || !adminFirstName || !adminLastName) {
+      toast({
+        title: "Login Failed",
+        description: "Please enter all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setIsLoading(prev => ({ ...prev, admin: true }));
+    
+    try {
+      await adminLogin(adminId, adminFirstName, adminLastName);
       toast({
         title: "Login Successful",
         description: `Welcome back, ${adminFirstName} ${adminLastName}!`,
       });
       navigate("/admin-dashboard");
-    } else {
+    } catch (error: any) {
+      console.error("Login error:", error);
+      toast({
+        title: "Login Failed",
+        description: error.response?.data?.error || "Invalid credentials or server error",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(prev => ({ ...prev, admin: false }));
+    }
+  };
+  
+  const handleConsumerLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!consumerId || !consumerFirstName || !consumerLastName) {
       toast({
         title: "Login Failed",
         description: "Please enter all required fields",
         variant: "destructive",
       });
+      return;
     }
-  };
-  
-  const handleConsumerLogin = (e: React.FormEvent) => {
-    e.preventDefault();
     
-    // In a real app, this would validate against the database
-    // For now, we'll simulate successful login with mock data
-    if (consumerId && consumerFirstName && consumerLastName) {
+    setIsLoading(prev => ({ ...prev, consumer: true }));
+    
+    try {
+      await consumerLogin(consumerId, consumerFirstName, consumerLastName);
       toast({
         title: "Login Successful",
         description: `Welcome back, ${consumerFirstName} ${consumerLastName}!`,
       });
       navigate("/consumer-dashboard");
-    } else {
+    } catch (error: any) {
+      console.error("Login error:", error);
       toast({
         title: "Login Failed",
-        description: "Please enter all required fields",
+        description: error.response?.data?.error || "Invalid credentials or server error",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(prev => ({ ...prev, consumer: false }));
     }
   };
   
@@ -115,7 +146,13 @@ const Login = () => {
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button type="submit" className="w-full">Login as Admin</Button>
+                  <Button 
+                    type="submit" 
+                    className="w-full" 
+                    disabled={isLoading.admin}
+                  >
+                    {isLoading.admin ? "Logging in..." : "Login as Admin"}
+                  </Button>
                 </CardFooter>
               </form>
             </Card>
@@ -160,12 +197,40 @@ const Login = () => {
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button type="submit" className="w-full">Login as Consumer</Button>
+                  <Button 
+                    type="submit" 
+                    className="w-full" 
+                    disabled={isLoading.consumer}
+                  >
+                    {isLoading.consumer ? "Logging in..." : "Login as Consumer"}
+                  </Button>
                 </CardFooter>
               </form>
             </Card>
           </TabsContent>
         </Tabs>
+        
+        <div className="mt-4 p-4 bg-blue-50 border border-blue-100 rounded-md">
+          <h3 className="font-semibold text-blue-700">Sample Login Credentials:</h3>
+          <div className="mt-2 grid grid-cols-2 gap-2">
+            <div>
+              <p className="text-sm font-medium">Admin:</p>
+              <ul className="text-xs text-gray-600">
+                <li>ID: ADM001</li>
+                <li>First Name: John</li>
+                <li>Last Name: Doe</li>
+              </ul>
+            </div>
+            <div>
+              <p className="text-sm font-medium">Consumer:</p>
+              <ul className="text-xs text-gray-600">
+                <li>ID: CON001</li>
+                <li>First Name: Alice</li>
+                <li>Last Name: Johnson</li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
