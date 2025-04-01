@@ -1,7 +1,6 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -68,53 +67,44 @@ export const AdminLoginForm = ({ setError }: AdminLoginFormProps) => {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Admin Login</CardTitle>
-        <CardDescription>
-          Enter your admin credentials to access the dashboard.
-        </CardDescription>
-      </CardHeader>
-      <form onSubmit={handleAdminLogin}>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="admin-id">Admin ID</Label>
-            <Input 
-              id="admin-id" 
-              placeholder="e.g. ADM001" 
-              value={adminId}
-              onChange={(e) => setAdminId(e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="admin-firstname">First Name</Label>
-            <Input 
-              id="admin-firstname" 
-              placeholder="Enter your first name" 
-              value={adminFirstName}
-              onChange={(e) => setAdminFirstName(e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="admin-lastname">Last Name</Label>
-            <Input 
-              id="admin-lastname" 
-              placeholder="Enter your last name" 
-              value={adminLastName}
-              onChange={(e) => setAdminLastName(e.target.value)}
-            />
-          </div>
-        </CardContent>
-        <CardFooter>
-          <Button 
-            type="submit" 
-            className="w-full" 
-            disabled={isLoading}
-          >
-            {isLoading ? "Logging in..." : "Login as Admin"}
-          </Button>
-        </CardFooter>
-      </form>
-    </Card>
+    <form onSubmit={handleAdminLogin} className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="admin-id">Admin ID</Label>
+        <Input 
+          id="admin-id" 
+          placeholder="e.g. ADM001" 
+          value={adminId}
+          onChange={(e) => setAdminId(e.target.value)}
+          className="bg-card/50 border-border/40 focus:border-primary"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="admin-firstname">First Name</Label>
+        <Input 
+          id="admin-firstname" 
+          placeholder="Enter your first name" 
+          value={adminFirstName}
+          onChange={(e) => setAdminFirstName(e.target.value)}
+          className="bg-card/50 border-border/40 focus:border-primary"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="admin-lastname">Last Name</Label>
+        <Input 
+          id="admin-lastname" 
+          placeholder="Enter your last name" 
+          value={adminLastName}
+          onChange={(e) => setAdminLastName(e.target.value)}
+          className="bg-card/50 border-border/40 focus:border-primary"
+        />
+      </div>
+      <Button 
+        type="submit" 
+        className="w-full bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary" 
+        disabled={isLoading}
+      >
+        {isLoading ? "Logging in..." : "Login as Admin"}
+      </Button>
+    </form>
   );
 };

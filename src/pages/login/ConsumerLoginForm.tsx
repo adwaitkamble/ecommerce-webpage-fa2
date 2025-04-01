@@ -1,7 +1,6 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -68,53 +67,44 @@ export const ConsumerLoginForm = ({ setError }: ConsumerLoginFormProps) => {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Consumer Login</CardTitle>
-        <CardDescription>
-          Enter your consumer credentials to access your account.
-        </CardDescription>
-      </CardHeader>
-      <form onSubmit={handleConsumerLogin}>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="consumer-id">Consumer ID</Label>
-            <Input 
-              id="consumer-id" 
-              placeholder="e.g. CON001" 
-              value={consumerId}
-              onChange={(e) => setConsumerId(e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="consumer-firstname">First Name</Label>
-            <Input 
-              id="consumer-firstname" 
-              placeholder="Enter your first name" 
-              value={consumerFirstName}
-              onChange={(e) => setConsumerFirstName(e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="consumer-lastname">Last Name</Label>
-            <Input 
-              id="consumer-lastname" 
-              placeholder="Enter your last name" 
-              value={consumerLastName}
-              onChange={(e) => setConsumerLastName(e.target.value)}
-            />
-          </div>
-        </CardContent>
-        <CardFooter>
-          <Button 
-            type="submit" 
-            className="w-full" 
-            disabled={isLoading}
-          >
-            {isLoading ? "Logging in..." : "Login as Consumer"}
-          </Button>
-        </CardFooter>
-      </form>
-    </Card>
+    <form onSubmit={handleConsumerLogin} className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="consumer-id">Consumer ID</Label>
+        <Input 
+          id="consumer-id" 
+          placeholder="e.g. CON001" 
+          value={consumerId}
+          onChange={(e) => setConsumerId(e.target.value)}
+          className="bg-card/50 border-border/40 focus:border-primary"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="consumer-firstname">First Name</Label>
+        <Input 
+          id="consumer-firstname" 
+          placeholder="Enter your first name" 
+          value={consumerFirstName}
+          onChange={(e) => setConsumerFirstName(e.target.value)}
+          className="bg-card/50 border-border/40 focus:border-primary"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="consumer-lastname">Last Name</Label>
+        <Input 
+          id="consumer-lastname" 
+          placeholder="Enter your last name" 
+          value={consumerLastName}
+          onChange={(e) => setConsumerLastName(e.target.value)}
+          className="bg-card/50 border-border/40 focus:border-primary"
+        />
+      </div>
+      <Button 
+        type="submit" 
+        className="w-full bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary" 
+        disabled={isLoading}
+      >
+        {isLoading ? "Logging in..." : "Login as Consumer"}
+      </Button>
+    </form>
   );
 };
