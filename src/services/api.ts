@@ -69,7 +69,22 @@ export const consumerLogin = async (consumerId: string, firstName: string, lastN
   try {
     console.log('Sending consumer login request with:', { consumerId, firstName, lastName });
     
-    const response = await api.post('/consumer/login', { consumerId, firstName, lastName });
+    // Make sure all parameters are uppercase to match database convention
+    const upperConsumerId = consumerId.trim().toUpperCase();
+    const upperFirstName = firstName.trim().toUpperCase();
+    const upperLastName = lastName.trim().toUpperCase();
+    
+    console.log('Normalized parameters:', { 
+      consumerId: upperConsumerId, 
+      firstName: upperFirstName, 
+      lastName: upperLastName 
+    });
+    
+    const response = await api.post('/consumer/login', { 
+      consumerId: upperConsumerId, 
+      firstName: upperFirstName, 
+      lastName: upperLastName 
+    });
     
     console.log('Consumer login response:', response.data);
     

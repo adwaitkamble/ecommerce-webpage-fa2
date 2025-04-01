@@ -83,12 +83,17 @@ app.post('/api/admin/login', (req, res) => {
   });
 });
 
-// Consumer Login
+// Consumer Login with improved error handling and debugging
 app.post('/api/consumer/login', (req, res) => {
   const { consumerId, firstName, lastName } = req.body;
   
   console.log('Consumer login attempt:', { consumerId, firstName, lastName });
   
+  if (!consumerId || !firstName || !lastName) {
+    return res.status(400).json({ error: 'Missing required fields' });
+  }
+  
+  // Query the database with exact ID (case sensitive)
   const query = 'SELECT * FROM Consumer WHERE Consumer_ID = ?';
   
   db.query(query, [consumerId], (err, results) => {
@@ -97,17 +102,19 @@ app.post('/api/consumer/login', (req, res) => {
       return res.status(500).json({ error: 'Database error' });
     }
     
+    console.log('Consumer query results:', results);
+    
     if (results.length === 0) {
       console.log('Consumer ID not found:', consumerId);
       return res.status(401).json({ error: 'Consumer ID not found' });
     }
     
-    // Consumer ID found, now check if the names match (case insensitive)
+    // Consumer ID found, now check if the names match (case insensitive because we're converting both to uppercase)
     const consumer = results[0];
-    const dbFirstName = consumer.First_Name.toLowerCase();
-    const dbLastName = consumer.Last_Name.toLowerCase();
-    const inputFirstName = firstName.toLowerCase();
-    const inputLastName = lastName.toLowerCase();
+    const dbFirstName = consumer.First_Name.toUpperCase();
+    const dbLastName = consumer.Last_Name.toUpperCase();
+    const inputFirstName = firstName.toUpperCase();
+    const inputLastName = lastName.toUpperCase();
     
     console.log('Comparing consumer names:', { 
       dbFirstName, inputFirstName, firstNameMatch: dbFirstName === inputFirstName,
@@ -128,8 +135,44 @@ app.post('/api/consumer/login', (req, res) => {
     } else {
       // Names don't match
       console.log('Consumer name mismatch, login failed');
-      return res.status(401).json({ error: 'Invalid credentials' });
+      return res.status(401).json({ 
+        error: 'Invalid credentials', 
+        details: 'Name does not match the provided consumer ID'
+      });
     }
+  });
+});
+
+// Add to cart endpoint
+app.post('/api/cart/add', (req, res) => {
+  const { consumerId, productId, quantity } = req.body;
+  console.log('Add to cart request:', { consumerId, productId, quantity });
+  
+  // Since we don't have actual cart functionality in the database yet,
+  // we'll simulate a successful response
+  res.json({ 
+    success: true, 
+    message: 'Product added to cart successfully',
+    cartItem: {
+      id: Math.floor(Math.random() * 1000),
+      consumerId,
+      productId,
+      quantity,
+      dateAdded: new Date().toISOString()
+    }
+  });
+});
+
+// Get cart items endpoint
+app.get('/api/cart/:consumerId', (req, res) => {
+  const { consumerId } = req.params;
+  console.log('Get cart items request for consumer:', consumerId);
+  
+  // Since we don't have actual cart functionality in the database yet,
+  // we'll simulate a response with empty cart items
+  res.json({
+    success: true,
+    cartItems: []
   });
 });
 
