@@ -1,7 +1,9 @@
 
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api';
+// Create a URL that works in both development and production environments
+// In a Lovable environment, we'll use a relative URL to avoid CORS issues
+const API_URL = '/api';
 
 // Create axios instance
 const api = axios.create({
@@ -9,7 +11,33 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  // Add timeout to prevent hanging requests
+  timeout: 10000
 });
+
+// Add response interceptor for better error handling
+api.interceptors.response.use(
+  response => response,
+  error => {
+    // Log detailed error information
+    if (error.response) {
+      // Server responded with non-2xx status
+      console.error('API Error Response:', { 
+        status: error.response.status,
+        data: error.response.data 
+      });
+    } else if (error.request) {
+      // Request made but no response received
+      console.error('API No Response:', error.request);
+      // Create a more user-friendly error message
+      error.message = "Cannot connect to server. Please check if the backend is running.";
+    } else {
+      // Error in setting up request
+      console.error('API Request Error:', error.message);
+    }
+    return Promise.reject(error);
+  }
+);
 
 // Admin authentication - Store user info in localStorage
 export const adminLogin = async (adminId: string, firstName: string, lastName: string) => {

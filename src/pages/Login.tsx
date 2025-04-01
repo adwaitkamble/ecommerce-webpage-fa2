@@ -6,6 +6,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { adminLogin, consumerLogin } from "@/services/api";
 
@@ -16,6 +18,7 @@ const Login = () => {
     admin: false,
     consumer: false
   });
+  const [error, setError] = useState<string | null>(null);
   
   // Admin login state
   const [adminId, setAdminId] = useState("");
@@ -29,6 +32,7 @@ const Login = () => {
   
   const handleAdminLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     
     if (!adminId || !adminFirstName || !adminLastName) {
       toast({
@@ -50,9 +54,20 @@ const Login = () => {
       navigate("/admin-dashboard");
     } catch (error: any) {
       console.error("Login error:", error);
+      
+      // Set appropriate error message based on the error
+      let errorMessage = "Invalid credentials or server error";
+      if (error.message === "Cannot connect to server. Please check if the backend is running.") {
+        errorMessage = error.message;
+      } else if (error.response?.data?.error) {
+        errorMessage = error.response.data.error;
+      }
+      
+      setError(errorMessage);
+      
       toast({
         title: "Login Failed",
-        description: error.response?.data?.error || "Invalid credentials or server error",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -62,6 +77,7 @@ const Login = () => {
   
   const handleConsumerLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     
     if (!consumerId || !consumerFirstName || !consumerLastName) {
       toast({
@@ -83,9 +99,20 @@ const Login = () => {
       navigate("/consumer-dashboard");
     } catch (error: any) {
       console.error("Login error:", error);
+      
+      // Set appropriate error message based on the error
+      let errorMessage = "Invalid credentials or server error";
+      if (error.message === "Cannot connect to server. Please check if the backend is running.") {
+        errorMessage = error.message;
+      } else if (error.response?.data?.error) {
+        errorMessage = error.response.data.error;
+      }
+      
+      setError(errorMessage);
+      
       toast({
         title: "Login Failed",
-        description: error.response?.data?.error || "Invalid credentials or server error",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -100,6 +127,15 @@ const Login = () => {
           <h1 className="text-3xl font-bold">E-Commerce Portal</h1>
           <p className="text-gray-500">Login to access your account</p>
         </div>
+        
+        {error && (
+          <Alert variant="destructive" className="mb-6">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              {error}
+            </AlertDescription>
+          </Alert>
+        )}
         
         <Tabs defaultValue="admin" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
@@ -217,16 +253,16 @@ const Login = () => {
               <p className="text-sm font-medium">Admin:</p>
               <ul className="text-xs text-gray-600">
                 <li>ID: ADM001</li>
-                <li>First Name: John</li>
-                <li>Last Name: Doe</li>
+                <li>First Name: Adwait</li>
+                <li>Last Name: Kamble</li>
               </ul>
             </div>
             <div>
               <p className="text-sm font-medium">Consumer:</p>
               <ul className="text-xs text-gray-600">
                 <li>ID: CON001</li>
-                <li>First Name: Alice</li>
-                <li>Last Name: Johnson</li>
+                <li>First Name: CHAUDHARI</li>
+                <li>Last Name: MANOJ</li>
               </ul>
             </div>
           </div>
