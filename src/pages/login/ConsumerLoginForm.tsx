@@ -37,10 +37,10 @@ export const ConsumerLoginForm = ({ setError }: ConsumerLoginFormProps) => {
     setIsLoading(true);
     
     try {
-      await consumerLogin(consumerId, consumerFirstName, consumerLastName);
+      const response = await consumerLogin(consumerId, consumerFirstName, consumerLastName);
       toast({
         title: "Login Successful",
-        description: `Welcome back, ${consumerFirstName} ${consumerLastName}!`,
+        description: `Welcome back, ${response.consumer.firstName} ${response.consumer.lastName}!`,
       });
       navigate("/consumer-dashboard");
     } catch (error: any) {
