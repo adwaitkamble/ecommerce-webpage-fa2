@@ -16,7 +16,7 @@ const db = mysql.createConnection({
   host: 'localhost',
   user: 'root',      // Replace with your MySQL username
   password: '',      // Replace with your MySQL password
-  database: 'ecommerce_db' // Replace with your database name
+  database: 'commerece' // Using the database name from the SQL
 });
 
 // Connect to MySQL
@@ -37,7 +37,7 @@ app.get('/api/test', (req, res) => {
 app.post('/api/admin/login', (req, res) => {
   const { adminId, firstName, lastName } = req.body;
   
-  const query = 'SELECT * FROM admins WHERE admin_id = ? AND first_name = ? AND last_name = ?';
+  const query = 'SELECT * FROM Admin WHERE Admin_ID = ? AND First_Name = ? AND Last_Name = ?';
   
   db.query(query, [adminId, firstName, lastName], (err, results) => {
     if (err) {
@@ -57,7 +57,7 @@ app.post('/api/admin/login', (req, res) => {
 app.post('/api/consumer/login', (req, res) => {
   const { consumerId, firstName, lastName } = req.body;
   
-  const query = 'SELECT * FROM consumers WHERE consumer_id = ? AND first_name = ? AND last_name = ?';
+  const query = 'SELECT * FROM Consumer WHERE Consumer_ID = ? AND First_Name = ? AND Last_Name = ?';
   
   db.query(query, [consumerId, firstName, lastName], (err, results) => {
     if (err) {
@@ -75,7 +75,11 @@ app.post('/api/consumer/login', (req, res) => {
 
 // Products API
 app.get('/api/products', (req, res) => {
-  const query = 'SELECT * FROM products';
+  const query = `
+    SELECT p.*, pc.Category_Name 
+    FROM Product p
+    JOIN Product_Category pc ON p.Category_ID = pc.Category_ID
+  `;
   
   db.query(query, (err, results) => {
     if (err) {
@@ -89,7 +93,14 @@ app.get('/api/products', (req, res) => {
 
 // Orders API
 app.get('/api/orders', (req, res) => {
-  const query = 'SELECT * FROM orders';
+  const query = `
+    SELECT o.*, 
+           c.First_Name, c.Last_Name,
+           p.Payment_Method, p.Payment_Status
+    FROM Orders o
+    LEFT JOIN Consumer c ON o.Consumer_ID = c.Consumer_ID
+    LEFT JOIN Payment p ON o.Order_No = p.Order_No
+  `;
   
   db.query(query, (err, results) => {
     if (err) {
@@ -103,7 +114,13 @@ app.get('/api/orders', (req, res) => {
 
 // Consumers API
 app.get('/api/consumers', (req, res) => {
-  const query = 'SELECT * FROM consumers';
+  const query = `
+    SELECT c.*, 
+           GROUP_CONCAT(cc.Contact_No) as Contact_Numbers
+    FROM Consumer c
+    LEFT JOIN Consumer_Contact cc ON c.Consumer_ID = cc.Consumer_ID
+    GROUP BY c.Consumer_ID
+  `;
   
   db.query(query, (err, results) => {
     if (err) {
@@ -117,7 +134,13 @@ app.get('/api/consumers', (req, res) => {
 
 // Suppliers API
 app.get('/api/suppliers', (req, res) => {
-  const query = 'SELECT * FROM suppliers';
+  const query = `
+    SELECT s.*, 
+           GROUP_CONCAT(sa.Address) as Addresses
+    FROM Supplier s
+    LEFT JOIN Supplier_Address sa ON s.Supplier_ID = sa.Supplier_ID
+    GROUP BY s.Supplier_ID
+  `;
   
   db.query(query, (err, results) => {
     if (err) {
