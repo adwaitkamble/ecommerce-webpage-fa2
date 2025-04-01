@@ -1,4 +1,3 @@
-
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
@@ -33,35 +32,53 @@ app.get('/api/test', (req, res) => {
   res.json({ message: 'Backend connection successful!' });
 });
 
-// Admin Login - Modified to properly check credentials
+// Admin Login - Added more detailed debugging and fixed case sensitivity issues
 app.post('/api/admin/login', (req, res) => {
   const { adminId, firstName, lastName } = req.body;
   
   console.log('Login attempt:', { adminId, firstName, lastName });
   
-  const query = 'SELECT * FROM Admin WHERE Admin_ID = ? AND First_Name = ? AND Last_Name = ?';
-  
-  db.query(query, [adminId, firstName, lastName], (err, results) => {
+  // First query the database to see if we can find the admin ID
+  db.query('SELECT * FROM Admin WHERE Admin_ID = ?', [adminId], (err, results) => {
     if (err) {
       console.error('Error executing query:', err);
       return res.status(500).json({ error: 'Database error' });
     }
     
-    console.log('Query results:', results);
+    console.log('Found admin by ID:', results);
     
     if (results.length === 0) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      return res.status(401).json({ error: 'Admin ID not found' });
     }
     
-    // Return admin data with proper capitalization
-    const admin = {
-      id: results[0].Admin_ID,
-      firstName: results[0].First_Name,
-      lastName: results[0].Last_Name,
-      role: results[0].Admin_Role
-    };
+    // Admin ID found, now check if the names match (case insensitive)
+    const admin = results[0];
+    const dbFirstName = admin.First_Name.toLowerCase();
+    const dbLastName = admin.Last_Name.toLowerCase();
+    const inputFirstName = firstName.toLowerCase();
+    const inputLastName = lastName.toLowerCase();
     
-    res.json({ success: true, admin });
+    console.log('Comparing names:', { 
+      dbFirstName, inputFirstName, firstNameMatch: dbFirstName === inputFirstName,
+      dbLastName, inputLastName, lastNameMatch: dbLastName === inputLastName 
+    });
+    
+    if (dbFirstName === inputFirstName && dbLastName === inputLastName) {
+      // Names match, return success
+      const adminData = {
+        id: admin.Admin_ID,
+        firstName: admin.First_Name,
+        lastName: admin.Last_Name,
+        role: admin.Admin_Role
+      };
+      
+      console.log('Login successful, returning admin data:', adminData);
+      return res.json({ success: true, admin: adminData });
+    } else {
+      // Names don't match
+      console.log('Name mismatch, login failed');
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
   });
 });
 
