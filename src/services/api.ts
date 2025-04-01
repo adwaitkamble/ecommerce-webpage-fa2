@@ -89,4 +89,41 @@ export const consumerLogin = async (consumerId: string, firstName: string, lastN
   }
 };
 
+// Add product to cart
+export const addToCart = async (productId: number, quantity: number = 1) => {
+  try {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    if (!user.id) {
+      throw new Error('User not logged in');
+    }
+    
+    const response = await api.post('/cart/add', {
+      consumerId: user.id,
+      productId,
+      quantity
+    });
+    
+    return response.data;
+  } catch (error) {
+    console.error('Add to cart error:', error);
+    throw error;
+  }
+};
+
+// Get cart items
+export const getCartItems = async () => {
+  try {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    if (!user.id) {
+      throw new Error('User not logged in');
+    }
+    
+    const response = await api.get(`/cart/${user.id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Get cart items error:', error);
+    throw error;
+  }
+};
+
 export default api;

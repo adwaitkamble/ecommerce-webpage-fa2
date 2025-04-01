@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { consumerLogin } from "@/services/api";
+import { Loader2 } from "lucide-react";
 
 interface ConsumerLoginFormProps {
   setError: (error: string | null) => void;
@@ -37,12 +38,17 @@ export const ConsumerLoginForm = ({ setError }: ConsumerLoginFormProps) => {
     setIsLoading(true);
     
     try {
+      console.log("Attempting consumer login with:", { consumerId, consumerFirstName, consumerLastName });
       const response = await consumerLogin(consumerId, consumerFirstName, consumerLastName);
+      console.log("Login response:", response);
+      
       toast({
         title: "Login Successful",
         description: `Welcome back, ${response.consumer.firstName} ${response.consumer.lastName}!`,
       });
-      navigate("/consumer-dashboard");
+      
+      // Redirect to the shop page after successful login
+      navigate("/shop");
     } catch (error: any) {
       console.error("Login error:", error);
       
@@ -103,7 +109,14 @@ export const ConsumerLoginForm = ({ setError }: ConsumerLoginFormProps) => {
         className="w-full bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary" 
         disabled={isLoading}
       >
-        {isLoading ? "Logging in..." : "Login as Consumer"}
+        {isLoading ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Logging in...
+          </>
+        ) : (
+          "Login as Consumer"
+        )}
       </Button>
     </form>
   );
