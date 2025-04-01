@@ -33,9 +33,11 @@ app.get('/api/test', (req, res) => {
   res.json({ message: 'Backend connection successful!' });
 });
 
-// Admin Login
+// Admin Login - Modified to properly check credentials
 app.post('/api/admin/login', (req, res) => {
   const { adminId, firstName, lastName } = req.body;
+  
+  console.log('Login attempt:', { adminId, firstName, lastName });
   
   const query = 'SELECT * FROM Admin WHERE Admin_ID = ? AND First_Name = ? AND Last_Name = ?';
   
@@ -45,11 +47,21 @@ app.post('/api/admin/login', (req, res) => {
       return res.status(500).json({ error: 'Database error' });
     }
     
+    console.log('Query results:', results);
+    
     if (results.length === 0) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
     
-    res.json({ success: true, admin: results[0] });
+    // Return admin data with proper capitalization
+    const admin = {
+      id: results[0].Admin_ID,
+      firstName: results[0].First_Name,
+      lastName: results[0].Last_Name,
+      role: results[0].Admin_Role
+    };
+    
+    res.json({ success: true, admin });
   });
 });
 

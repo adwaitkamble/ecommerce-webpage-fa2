@@ -11,12 +11,22 @@ const api = axios.create({
   },
 });
 
-// Admin authentication
+// Admin authentication - Store user info in localStorage
 export const adminLogin = async (adminId: string, firstName: string, lastName: string) => {
   try {
     const response = await api.post('/admin/login', { adminId, firstName, lastName });
+    
+    // Store admin data in localStorage if login successful
+    if (response.data.success) {
+      localStorage.setItem('user', JSON.stringify({
+        type: 'admin',
+        ...response.data.admin
+      }));
+    }
+    
     return response.data;
   } catch (error) {
+    console.error('Admin login error:', error);
     throw error;
   }
 };
