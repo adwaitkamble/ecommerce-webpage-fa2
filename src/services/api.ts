@@ -2,8 +2,8 @@
 import axios from 'axios';
 
 // Create a URL that works in both development and production environments
-// In a Lovable environment, we'll use a relative URL to avoid CORS issues
-const API_URL = '/api';
+// In a Lovable environment, we'll use an absolute URL to avoid CORS issues
+const API_URL = 'http://localhost:5000/api';
 
 // Create axios instance
 const api = axios.create({
